@@ -23,6 +23,9 @@ interface ControlPanelProps {
   isRecording: boolean;
   recordingTime: number;
   onMove: (direction: 'forward' | 'backward') => void;
+  onAscend: () => void;
+  onDescend: () => void;
+  onRotate: (direction: 'left' | 'right') => void;
 }
 
 const formatTime = (seconds: number) => {
@@ -40,6 +43,9 @@ const ControlPanel: FC<ControlPanelProps> = ({
   isRecording,
   recordingTime,
   onMove,
+  onAscend,
+  onDescend,
+  onRotate,
 }) => {
   const { t, language } = useContext(LanguageContext);
   const buttonStyle =
@@ -58,10 +64,18 @@ const ControlPanel: FC<ControlPanelProps> = ({
       <VirtualJoystick />
       <div className="flex items-center gap-4">
         <div className="flex flex-col gap-2">
-          <Button aria-label={t.controls.ascend} className={smallButtonStyle}>
+          <Button
+            aria-label={t.controls.ascend}
+            className={smallButtonStyle}
+            onClick={onAscend}
+          >
             <ArrowUp />
           </Button>
-          <Button aria-label={t.controls.descend} className={smallButtonStyle}>
+          <Button
+            aria-label={t.controls.descend}
+            className={smallButtonStyle}
+            onClick={onDescend}
+          >
             <ArrowDown />
           </Button>
         </div>
@@ -82,10 +96,18 @@ const ControlPanel: FC<ControlPanelProps> = ({
           </Button>
         </div>
         <div className="flex flex-col gap-2">
-          <Button aria-label={t.controls.rotateLeft} className={smallButtonStyle}>
+          <Button
+            aria-label={t.controls.rotateLeft}
+            className={smallButtonStyle}
+            onClick={() => onRotate('left')}
+          >
             <RotateCcw />
           </Button>
-          <Button aria-label={t.controls.rotateRight} className={smallButtonStyle}>
+          <Button
+            aria-label={t.controls.rotateRight}
+            className={smallButtonStyle}
+            onClick={() => onRotate('right')}
+          >
             <RotateCw />
           </Button>
         </div>

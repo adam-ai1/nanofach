@@ -29,7 +29,9 @@
     }
   },
   "main": {
-    "depth": "DEPTH"
+    "depth": "DEPTH",
+    "altitude": "ALTITUDE",
+    "orientation": "ROLL"
   },
   "telemetry": {
     "title": "TELEMETRY",

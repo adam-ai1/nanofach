@@ -23,8 +23,12 @@ export interface NanoFishData {
   compass: number;
   connection: number;
   leakDetected: boolean;
+ codex/add-movement-callbacks-in-page.tsx
+  fishPosition: { x: number; y: number; z: number; orientation: number };
+
   fishPosition: { x: number; y: number; z: number };
   fishOrientation: { yaw: number; pitch: number; roll: number };
+ main
 }
 
 export type SensorStatus = {
@@ -57,8 +61,12 @@ export default function DashboardPage() {
     compass: 45,
     connection: 4,
     leakDetected: false,
+ codex/add-movement-callbacks-in-page.tsx
+    fishPosition: { x: 0, y: 0, z: 0, orientation: 0 },
+
     fishPosition: { x: 0, y: 0, z: 0 },
     fishOrientation: { yaw: 0, pitch: 0, roll: 0 },
+ main
   });
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isRecording, setIsRecording] = useState(false);
@@ -225,12 +233,45 @@ export default function DashboardPage() {
     });
   };
 
+ codex/add-movement-callbacks-in-page.tsx
+  const handleAscend = () => {
+    setData((prev) => {
+      const newZ = Math.min(50, prev.fishPosition.z + 5);
+      return {
+        ...prev,
+        fishPosition: { ...prev.fishPosition, z: newZ },
+      };
+    });
+  };
+
+  const handleDescend = () => {
+    setData((prev) => {
+      const newZ = Math.max(-50, prev.fishPosition.z - 5);
+      return {
+        ...prev,
+        fishPosition: { ...prev.fishPosition, z: newZ },
+      };
+    });
+  };
+
+  const handleRotate = (direction: 'left' | 'right') => {
+    setData((prev) => {
+      const delta = direction === 'left' ? -15 : 15;
+      const orientation = (prev.fishPosition.orientation + delta + 360) % 360;
+      return {
+        ...prev,
+        fishPosition: { ...prev.fishPosition, orientation },
+      };
+    });
+  };
+
   useEffect(() => {
     const storedVideoUrl = localStorage.getItem(LOCAL_BACKGROUND_VIDEO_KEY);
     if (storedVideoUrl) {
       setBackgroundVideoUrl(storedVideoUrl);
     }
   }, []);
+ main
 
   return (
     <main className="flex flex-col h-[100dvh] w-screen overflow-hidden bg-background">
@@ -252,6 +293,9 @@ export default function DashboardPage() {
         isRecording={isRecording}
         recordingTime={recordingTime}
         onMove={handleMove}
+        onAscend={handleAscend}
+        onDescend={handleDescend}
+        onRotate={handleRotate}
       />
     </main>
   );

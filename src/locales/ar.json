@@ -29,7 +29,9 @@
     }
   },
   "main": {
-    "depth": "العمق"
+    "depth": "العمق",
+    "altitude": "الارتفاع",
+    "orientation": "ميل الاتجاه"
   },
   "telemetry": {
     "title": "القياس عن بعد",
