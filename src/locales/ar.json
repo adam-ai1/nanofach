@@ -1,0 +1,72 @@
+{
+  "layout": {
+    "title": "تحكم نانو فيش",
+    "description": "لوحة تحكم متقدمة لروبوت نانو فيش تحت الماء."
+  },
+  "alerts": {
+    "systemConnected": "تم توصيل النظام.",
+    "lowBattery": "تحذير انخفاض البطارية!",
+    "leakDetected": "خطر! تم اكتشاف تسرب!"
+  },
+  "toasts": {
+    "recording": {
+      "title": "إجراء التسجيل",
+      "description": "تم تبديل بدء/إيقاف التسجيل."
+    },
+    "snapshot": {
+      "title": "تحكم المهمة",
+      "description": "تم التقاط لقطة."
+    },
+    "surface": {
+      "title": "تحكم المهمة",
+      "description": "بدء تسلسل الصعود التلقائي."
+    },
+    "connection": {
+      "title": "الشبكة",
+      "description": "تم الربط بنجاح بشبكة NanoFish-AP.",
+      "failedTitle": "فشل الاتصال",
+      "failedDescription": "تعذر الاتصال بالشبكة المحددة."
+    }
+  },
+  "main": {
+    "depth": "العمق"
+  },
+  "telemetry": {
+    "title": "القياس عن بعد",
+    "temperature": "درجة الحرارة",
+    "acidity": "الحموضة (pH)",
+    "pressure": "الضغط",
+    "connection": "الاتصال",
+    "battery": "البطارية",
+    "sensorControl": "التحكم بالحساسات",
+    "sensors": {
+      "camera": "الكاميرا",
+      "sonar": "السونار",
+      "temp": "الحرارة",
+      "ph": "الحموضة",
+      "pressure": "الضغط",
+      "leak": "التسرب"
+    },
+    "connectivity": {
+      "title": "الاتصال",
+      "connecting": "جاري الاتصال...",
+      "connectButton": "ربط سمكة النانو",
+      "availableNetworks": "الشبكات المتاحة"
+    },
+    "leak": {
+      "title": "كشف التسرب",
+      "noLeak": "آمن",
+      "description": "تم اكتشاف تسرب محتمل للمياه!"
+    }
+  },
+  "controls": {
+    "ascend": "صعود",
+    "descend": "هبوط",
+    "rotateLeft": "دوران لليسار",
+    "rotateRight": "دوران لليمين",
+    "record": "بدء/إيقاف التسجيل",
+    "takePicture": "التقاط صورة",
+    "surface": "العودة إلى السطح",
+    "recording": "جاري التسجيل..."
+  }
+}

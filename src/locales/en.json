@@ -1,0 +1,72 @@
+{
+  "layout": {
+    "title": "Nano Fish Control",
+    "description": "Advanced control dashboard for the Nano Fish underwater robot."
+  },
+  "alerts": {
+    "systemConnected": "System connected.",
+    "lowBattery": "Low battery warning!",
+    "leakDetected": "DANGER! Leak Detected!"
+  },
+  "toasts": {
+    "recording": {
+      "title": "Recording Action",
+      "description": "Start/Stop recording toggled."
+    },
+    "snapshot": {
+      "title": "Mission Control",
+      "description": "Snapshot captured."
+    },
+    "surface": {
+      "title": "Mission Control",
+      "description": "Auto-surface sequence initiated."
+    },
+    "connection": {
+      "title": "Network",
+      "description": "Successfully connected to NanoFish-AP.",
+      "failedTitle": "Connection Failed",
+      "failedDescription": "Could not connect to the selected network."
+    }
+  },
+  "main": {
+    "depth": "DEPTH"
+  },
+  "telemetry": {
+    "title": "TELEMETRY",
+    "temperature": "Temperature",
+    "acidity": "Acidity (pH)",
+    "pressure": "Pressure",
+    "connection": "CONNECTION",
+    "battery": "BATTERY",
+    "sensorControl": "Sensor Control",
+    "sensors": {
+      "camera": "Camera",
+      "sonar": "Sonar",
+      "temp": "Temp",
+      "ph": "pH",
+      "pressure": "Pressure",
+      "leak": "Leak"
+    },
+    "connectivity": {
+      "title": "Connectivity",
+      "connecting": "Connecting...",
+      "connectButton": "Connect NanoFish",
+      "availableNetworks": "Available Networks"
+    },
+    "leak": {
+      "title": "Leak Detection",
+      "noLeak": "Secure",
+      "description": "Potential water leak has been detected!"
+    }
+  },
+  "controls": {
+    "ascend": "Ascend",
+    "descend": "Descend",
+    "rotateLeft": "Rotate Left",
+    "rotateRight": "Rotate Right",
+    "record": "Start/Stop Recording",
+    "takePicture": "Take Picture",
+    "surface": "Return to Surface",
+    "recording": "Recording..."
+  }
+}
