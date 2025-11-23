@@ -3,8 +3,19 @@
 import type { FC } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { NanoFishData } from '@/app/page';
-import { Color, Euler, Group, MathUtils, Quaternion, Vector3 } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import {
+  BoxGeometry,
+  Color,
+  ConeGeometry,
+  Euler,
+  Group,
+  MathUtils,
+  MeshPhysicalMaterial,
+  MeshStandardMaterial,
+  Quaternion,
+  SphereGeometry,
+  Vector3,
+} from 'three';
 
 type FiberExports = typeof import('@react-three/fiber');
 type DreiExports = typeof import('@react-three/drei');
@@ -62,17 +73,13 @@ const OceanScene: FC<{ data: NanoFishData }> = ({ data }) => {
     return <div className="absolute inset-0" aria-hidden />;
   }
 
-  const { Canvas, useFrame, useLoader } = fiber;
+  const { Canvas, useFrame } = fiber;
   const { Environment, OrbitControls, PerspectiveCamera } = drei;
 
   const FishModel: FC<{
     position: { x: number; y: number; z: number };
     orientation: { yaw: number; pitch: number; roll: number };
   }> = ({ position, orientation }) => {
-    const gltf = useLoader(
-      GLTFLoader,
-      'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF/BarramundiFish.gltf'
-    );
     const groupRef = useRef<Group | null>(null);
 
     const targetPosition = useMemo(
@@ -90,6 +97,72 @@ const OceanScene: FC<{ data: NanoFishData }> = ({ data }) => {
       return quaternion;
     }, [orientation.pitch, orientation.roll, orientation.yaw]);
 
+    const bodyMaterial = useMemo(
+      () =>
+        new MeshPhysicalMaterial({
+          color: '#d86c29',
+          roughness: 0.35,
+          metalness: 0.05,
+          clearcoat: 0.35,
+          clearcoatRoughness: 0.6,
+        }),
+      []
+    );
+
+    const finMaterial = useMemo(
+      () =>
+        new MeshStandardMaterial({
+          color: '#f1c59a',
+          transparent: true,
+          opacity: 0.92,
+          roughness: 0.6,
+          metalness: 0.05,
+        }),
+      []
+    );
+
+    const accentMaterial = useMemo(
+      () =>
+        new MeshStandardMaterial({
+          color: '#1f1f1f',
+          metalness: 0.7,
+          roughness: 0.2,
+        }),
+      []
+    );
+
+    const bodyGeometry = useMemo(() => new SphereGeometry(7, 42, 42), []);
+    const tailGeometry = useMemo(() => new ConeGeometry(3, 7, 24), []);
+    const dorsalFinGeometry = useMemo(() => new ConeGeometry(2.3, 5, 18), []);
+    const ventralFinGeometry = useMemo(() => new ConeGeometry(1.8, 4, 18), []);
+    const deviceBodyGeometry = useMemo(() => new BoxGeometry(1.8, 0.8, 2.2), []);
+    const deviceWingGeometry = useMemo(() => new BoxGeometry(1.1, 0.6, 2.8), []);
+
+    useEffect(
+      () => () => {
+        bodyMaterial.dispose();
+        finMaterial.dispose();
+        accentMaterial.dispose();
+        bodyGeometry.dispose();
+        tailGeometry.dispose();
+        dorsalFinGeometry.dispose();
+        ventralFinGeometry.dispose();
+        deviceBodyGeometry.dispose();
+        deviceWingGeometry.dispose();
+      },
+      [
+        accentMaterial,
+        bodyGeometry,
+        bodyMaterial,
+        deviceBodyGeometry,
+        deviceWingGeometry,
+        dorsalFinGeometry,
+        finMaterial,
+        tailGeometry,
+        ventralFinGeometry,
+      ]
+    );
+
     useFrame((_, delta) => {
       const group = groupRef.current;
       if (!group) return;
@@ -100,8 +173,31 @@ const OceanScene: FC<{ data: NanoFishData }> = ({ data }) => {
     });
 
     return (
-      <group ref={groupRef} dispose={null} scale={0.3} position={[0, 0, 0]}>
-        <primitive object={gltf.scene} />
+      <group ref={groupRef} dispose={null} scale={0.22} position={[0, 0, 0]}>
+        <mesh geometry={bodyGeometry} material={bodyMaterial} scale={[1.2, 0.95, 0.7]} />
+        <mesh
+          geometry={tailGeometry}
+          material={finMaterial}
+          position={[-7.8, 0.4, 0]}
+          rotation={[0, 0, MathUtils.degToRad(12)]}
+          scale={[1.1, 1.2, 1]}
+        />
+        <mesh
+          geometry={dorsalFinGeometry}
+          material={finMaterial}
+          position={[0.8, 1.8, 0]}
+          rotation={[MathUtils.degToRad(82), 0, 0]}
+          scale={[0.8, 0.8, 0.8]}
+        />
+        <mesh
+          geometry={ventralFinGeometry}
+          material={finMaterial}
+          position={[1.4, -1.8, 0]}
+          rotation={[MathUtils.degToRad(-75), 0, 0]}
+          scale={[0.9, 0.9, 0.9]}
+        />
+        <mesh geometry={deviceBodyGeometry} material={accentMaterial} position={[-3.8, -0.5, -0.7]} />
+        <mesh geometry={deviceWingGeometry} material={accentMaterial} position={[-4.8, -0.4, 0.8]} />
       </group>
     );
   };

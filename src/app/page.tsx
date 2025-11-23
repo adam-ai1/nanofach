@@ -23,12 +23,8 @@ export interface NanoFishData {
   compass: number;
   connection: number;
   leakDetected: boolean;
- codex/add-movement-callbacks-in-page.tsx
   fishPosition: { x: number; y: number; z: number; orientation: number };
-
-  fishPosition: { x: number; y: number; z: number };
   fishOrientation: { yaw: number; pitch: number; roll: number };
- main
 }
 
 export type SensorStatus = {
@@ -61,12 +57,8 @@ export default function DashboardPage() {
     compass: 45,
     connection: 4,
     leakDetected: false,
- codex/add-movement-callbacks-in-page.tsx
     fishPosition: { x: 0, y: 0, z: 0, orientation: 0 },
-
-    fishPosition: { x: 0, y: 0, z: 0 },
     fishOrientation: { yaw: 0, pitch: 0, roll: 0 },
- main
   });
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isRecording, setIsRecording] = useState(false);
@@ -124,6 +116,7 @@ export default function DashboardPage() {
           x: Math.max(-60, Math.min(60, prev.fishPosition.x + (Math.random() - 0.5) * 4)),
           y: Math.max(-40, Math.min(40, prev.fishPosition.y + (Math.random() - 0.5) * 3)),
           z: Math.max(-30, Math.min(30, prev.fishPosition.z + (Math.random() - 0.5) * 3)),
+          orientation: prev.fishPosition.orientation,
         },
         fishOrientation: {
           yaw: (prev.fishOrientation.yaw + (Math.random() - 0.5) * 8 + 360) % 360,
@@ -233,7 +226,6 @@ export default function DashboardPage() {
     });
   };
 
- codex/add-movement-callbacks-in-page.tsx
   const handleAscend = () => {
     setData((prev) => {
       const newZ = Math.min(50, prev.fishPosition.z + 5);
@@ -271,7 +263,6 @@ export default function DashboardPage() {
       setBackgroundVideoUrl(storedVideoUrl);
     }
   }, []);
- main
 
   return (
     <main className="flex flex-col h-[100dvh] w-screen overflow-hidden bg-background">
