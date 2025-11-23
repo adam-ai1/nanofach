@@ -3,6 +3,7 @@
 import type { FC } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { NanoFishData } from '@/app/page';
+ codex/check-for-errors-in-project-0pm7nw
 import {
   BoxGeometry,
   Color,
@@ -16,6 +17,10 @@ import {
   SphereGeometry,
   Vector3,
 } from 'three';
+
+import { Color, Euler, Group, MathUtils, Quaternion, Vector3 } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+ main
 
 type FiberExports = typeof import('@react-three/fiber');
 type DreiExports = typeof import('@react-three/drei');
