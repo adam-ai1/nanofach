@@ -39,6 +39,10 @@ export type SensorStatus = {
 const MAX_DEPTH = 100;
 const MIN_TEMP = 5;
 const MAX_TEMP = 30;
+const DEFAULT_BACKGROUND_VIDEO_URL =
+  process.env.NEXT_PUBLIC_BACKGROUND_VIDEO_URL ??
+  'https://firebasestorage.googleapis.com/v0/b/firebase-studio-demo-project.appspot.com/o/defaults%2Fwater_in_fishtank.mp4?alt=media&token=8fa6c52a-6058-45e0-b635-b82531649642';
+const LOCAL_BACKGROUND_VIDEO_KEY = 'backgroundVideoUrl';
 
 export default function DashboardPage() {
   const { toast } = useToast();
@@ -68,6 +72,9 @@ export default function DashboardPage() {
     pressure: true,
     leak: true,
   });
+  const [backgroundVideoUrl, setBackgroundVideoUrl] = useState(
+    DEFAULT_BACKGROUND_VIDEO_URL
+  );
 
   const addAlert = useCallback((message: string, type: Alert['type']) => {
     setAlerts(
@@ -218,10 +225,20 @@ export default function DashboardPage() {
     });
   };
 
+  useEffect(() => {
+    const storedVideoUrl = localStorage.getItem(LOCAL_BACKGROUND_VIDEO_KEY);
+    if (storedVideoUrl) {
+      setBackgroundVideoUrl(storedVideoUrl);
+    }
+  }, []);
+
   return (
     <main className="flex flex-col h-[100dvh] w-screen overflow-hidden bg-background">
       <div className="relative flex-grow">
-        <MainViewport data={data} />
+        <MainViewport
+          data={data}
+          backgroundVideoUrl={backgroundVideoUrl || undefined}
+        />
         <TelemetrySidebar
           data={data}
           sensorStatus={sensorStatus}
