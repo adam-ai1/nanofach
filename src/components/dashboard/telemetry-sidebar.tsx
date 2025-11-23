@@ -11,11 +11,14 @@ import {
   Ruler,
   AlertTriangle,
   Power,
+  Upload,
+  Link as LinkIcon,
+  RefreshCw,
 } from 'lucide-react';
 import DataCard from '@/components/dashboard/data-card';
 import CircularProgress from '@/components/dashboard/circular-progress';
 import { Icons } from '@/components/icons';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { LanguageContext } from '@/context/language-context';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
@@ -28,11 +31,17 @@ import {
 } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { Input } from '../ui/input';
 
 interface TelemetrySidebarProps {
   data: NanoFishData;
   sensorStatus: SensorStatus;
   onSensorToggle: (sensorId: keyof SensorStatus, checked: boolean) => void;
+  backgroundVideoUrl: string;
+  defaultBackgroundVideoUrl: string;
+  onBackgroundVideoUrlChange: (url: string) => void;
+  onBackgroundVideoFileChange: (file: File) => Promise<boolean>;
+  onResetBackgroundVideo: () => void;
 }
 
 const wifiNetworks = ['Home-Wifi', 'Public-Hotspot', 'NanoFish-AP', 'AndroidAP'];
@@ -41,11 +50,22 @@ const TelemetrySidebar: FC<TelemetrySidebarProps> = ({
   data,
   sensorStatus,
   onSensorToggle,
+  backgroundVideoUrl,
+  defaultBackgroundVideoUrl,
+  onBackgroundVideoUrlChange,
+  onBackgroundVideoFileChange,
+  onResetBackgroundVideo,
 }) => {
   const { t, language, setLanguage } = useContext(LanguageContext);
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [videoUrlInput, setVideoUrlInput] = useState(backgroundVideoUrl);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    setVideoUrlInput(backgroundVideoUrl);
+  }, [backgroundVideoUrl]);
 
   const handleConnect = (network: string) => {
     if (network === 'NanoFish-AP') {
@@ -59,12 +79,48 @@ const TelemetrySidebar: FC<TelemetrySidebarProps> = ({
         });
       }, 2000);
     } else {
-       toast({
-          variant: 'destructive',
-          title: t.toasts.connection.failedTitle,
-          description: t.toasts.connection.failedDescription,
-        });
+      toast({
+        variant: 'destructive',
+        title: t.toasts.connection.failedTitle,
+        description: t.toasts.connection.failedDescription,
+      });
     }
+  };
+
+  const handleApplyVideoUrl = () => {
+    const trimmed = videoUrlInput.trim();
+    if (!trimmed) return;
+    onBackgroundVideoUrlChange(trimmed);
+    toast({
+      title: t.telemetry.video.updatedTitle,
+      description: t.telemetry.video.urlApplied,
+    });
+  };
+
+  const handleVideoFile = async (file: File) => {
+    const persisted = await onBackgroundVideoFileChange(file);
+    toast({
+      title: t.telemetry.video.updatedTitle,
+      description: persisted
+        ? t.telemetry.video.localAppliedPersistent
+        : t.telemetry.video.localAppliedTemporary,
+    });
+    if (!persisted) {
+      toast({
+        variant: 'destructive',
+        title: t.telemetry.video.oversizeTitle,
+        description: t.telemetry.video.oversizeDescription,
+      });
+    }
+  };
+
+  const handleResetVideo = () => {
+    onResetBackgroundVideo();
+    setVideoUrlInput(defaultBackgroundVideoUrl);
+    toast({
+      title: t.telemetry.video.resetTitle,
+      description: t.telemetry.video.resetDescription,
+    });
   };
 
   const sensorControls: { id: keyof SensorStatus; label: string; icon: FC<any> }[] = [
@@ -210,17 +266,88 @@ const TelemetrySidebar: FC<TelemetrySidebarProps> = ({
                     key={net}
                     variant="ghost"
                     className="justify-start gap-2"
-                    onClick={() => handleConnect(net)}
-                    disabled={isConnecting && net === 'NanoFish-AP'}
-                  >
-                    <Wifi size={16} />
-                    <span>{net}</span>
-                     {isConnecting && net === 'NanoFish-AP' && <div className="w-2 h-2 rounded-full bg-primary animate-pulse ml-auto" />}
-                  </Button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+                  onClick={() => handleConnect(net)}
+                  disabled={isConnecting && net === 'NanoFish-AP'}
+                >
+                  <Wifi size={16} />
+                  <span>{net}</span>
+                  {isConnecting && net === 'NanoFish-AP' && (
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse ml-auto" />
+                  )}
+                </Button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+        </div>
+      </div>
+
+      <Separator className="my-2" />
+
+      <div className="flex flex-col gap-3">
+        <h3 className="text-lg font-semibold text-primary/80">
+          {t.telemetry.video.title}
+        </h3>
+        <div className="p-4 bg-black/20 rounded-lg border border-border flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="background-video-url" className="text-xs text-muted-foreground">
+              {t.telemetry.video.urlLabel}
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="background-video-url"
+                placeholder={t.telemetry.video.urlPlaceholder}
+                value={videoUrlInput}
+                onChange={(e) => setVideoUrlInput(e.target.value)}
+              />
+              <Button onClick={handleApplyVideoUrl} disabled={!videoUrlInput.trim()}>
+                <LinkIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">{t.telemetry.video.applyUrl}</span>
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">{t.telemetry.video.urlHelp}</p>
+          </div>
+
+          <Separator />
+
+          <div className="flex flex-col gap-2">
+            <Label className="text-xs text-muted-foreground">
+              {t.telemetry.video.localLabel}
+            </Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="video/*"
+              className="hidden"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                await handleVideoFile(file);
+                event.target.value = '';
+              }}
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 min-w-[140px]"
+              >
+                <Upload className="h-4 w-4" />
+                <span className="ml-2">{t.telemetry.video.chooseFile}</span>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleResetVideo}
+                className="min-w-[120px]"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span className="ml-2">{t.telemetry.video.resetButton}</span>
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">{t.telemetry.video.localHelp}</p>
+          </div>
         </div>
       </div>
     </aside>

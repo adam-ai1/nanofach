@@ -55,6 +55,25 @@
       "connectButton": "Connect NanoFish",
       "availableNetworks": "Available Networks"
     },
+    "video": {
+      "title": "Background Video",
+      "urlLabel": "Video link",
+      "urlPlaceholder": "Paste an MP4/WEBM link or data: URL",
+      "urlHelp": "Use any reachable link; if it fails, the default background will load automatically.",
+      "applyUrl": "Use link",
+      "localLabel": "Use a local file",
+      "chooseFile": "Choose file",
+      "localHelp": "Pick a video from your device. Small files are saved for next time; large ones run for this session only.",
+      "updatedTitle": "Background updated",
+      "urlApplied": "Video source updated from the link.",
+      "localAppliedPersistent": "Local video loaded and saved for reuse.",
+      "localAppliedTemporary": "Local video loaded for this session.",
+      "oversizeTitle": "File not saved",
+      "oversizeDescription": "The video is too large to keep for future visits, but it will play now.",
+      "resetTitle": "Background restored",
+      "resetDescription": "Reverted to the default video backdrop.",
+      "resetButton": "Reset"
+    },
     "leak": {
       "title": "Leak Detection",
       "noLeak": "Secure",

@@ -78,29 +78,42 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
 
   return (
     <div className="absolute inset-0 z-0">
+ codex/check-for-errors-in-project-ivrcrk
+
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-sky-950/40 to-slate-950" />
       <OceanScene data={data} />
 
+ main
       <video
         autoPlay
         loop
         muted
         key={resolvedVideoUrl}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover z-0"
         poster={defaultPoster}
         onError={() => setUseFallbackVideo(true)}
       >
         <source src={resolvedVideoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-sky-950/40 to-slate-950 z-10" />
+      <div className="absolute inset-0 z-20 pointer-events-none">
+        <OceanScene data={data} />
+      </div>
+      <div className="absolute inset-0 bg-black/40 z-30" />
+
+ codex/check-for-errors-in-project-ivrcrk
+      <div className="absolute inset-0 z-40 pointer-events-none">
+        <FishModel position={data.fishPosition} />
+      </div>
 
       <FishModel position={data.fishPosition} />
+main
 
       {/* Overlays */}
       <div
         dir={direction}
-        className={`absolute top-4 text-white p-2 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${batteryPositionClasses}`}
+        className={`absolute top-4 text-white p-2 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${batteryPositionClasses} z-50`}
       >
         <div className="flex items-center gap-2">
           <Battery className={`h-6 w-6 ${getBatteryColor(data.battery)}`} />
@@ -116,14 +129,14 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
 
       <div
         dir={direction}
-        className={`absolute top-4 ${compassPositionClasses}`}
+        className={`absolute top-4 ${compassPositionClasses} z-50`}
       >
         <Compass heading={data.compass} />
       </div>
 
       <div
         dir={direction}
-        className={`absolute top-28 text-white p-2 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${compassPositionClasses}`}
+        className={`absolute top-28 text-white p-2 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${compassPositionClasses} z-50`}
       >
         <div className="flex items-center gap-2">
           <RotateCw className="h-5 w-5 text-primary" />
@@ -138,7 +151,7 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
 
       <div
         dir={direction}
-        className={`absolute bottom-4 text-white p-3 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${depthPositionClasses}`}
+        className={`absolute bottom-4 text-white p-3 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${depthPositionClasses} z-50`}
       >
         <div className="flex items-end gap-2">
           <Waves className="h-8 w-8 text-primary" />
@@ -156,7 +169,7 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
 
       <div
         dir={direction}
-        className={`absolute bottom-28 text-white p-3 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${depthPositionClasses}`}
+        className={`absolute bottom-28 text-white p-3 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${depthPositionClasses} z-50`}
       >
         <div className="flex items-end gap-2">
           <MoveVertical className="h-6 w-6 text-primary" />
