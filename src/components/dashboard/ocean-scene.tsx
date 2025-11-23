@@ -3,8 +3,21 @@
 import type { FC } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { NanoFishData } from '@/app/page';
-import { Color, Euler, Group, MathUtils, Quaternion, Vector3 } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import {
+  BoxGeometry,
+  CircleGeometry,
+  Color,
+  ConeGeometry,
+  Euler,
+  Group,
+  MathUtils,
+  MeshBasicMaterial,
+  MeshPhysicalMaterial,
+  MeshStandardMaterial,
+  Quaternion,
+  SphereGeometry,
+  Vector3,
+} from 'three';
 
 type FiberExports = typeof import('@react-three/fiber');
 type DreiExports = typeof import('@react-three/drei');
@@ -62,17 +75,13 @@ const OceanScene: FC<{ data: NanoFishData }> = ({ data }) => {
     return <div className="absolute inset-0" aria-hidden />;
   }
 
-  const { Canvas, useFrame, useLoader } = fiber;
+  const { Canvas, useFrame } = fiber;
   const { Environment, OrbitControls, PerspectiveCamera } = drei;
 
   const FishModel: FC<{
     position: { x: number; y: number; z: number };
     orientation: { yaw: number; pitch: number; roll: number };
   }> = ({ position, orientation }) => {
-    const gltf = useLoader(
-      GLTFLoader,
-      'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF/BarramundiFish.gltf'
-    );
     const groupRef = useRef<Group | null>(null);
 
     const targetPosition = useMemo(
@@ -90,6 +99,104 @@ const OceanScene: FC<{ data: NanoFishData }> = ({ data }) => {
       return quaternion;
     }, [orientation.pitch, orientation.roll, orientation.yaw]);
 
+    const bodyMaterial = useMemo(
+      () =>
+        new MeshPhysicalMaterial({
+          color: '#5a4bb3',
+          roughness: 0.4,
+          metalness: 0.08,
+          clearcoat: 0.55,
+          clearcoatRoughness: 0.35,
+          sheen: 0.35,
+          sheenColor: new Color('#5f8cff'),
+        }),
+      []
+    );
+
+    const finMaterial = useMemo(
+      () =>
+        new MeshStandardMaterial({
+          color: '#f7c948',
+          transparent: true,
+          opacity: 0.9,
+          roughness: 0.5,
+          metalness: 0.1,
+        }),
+      []
+    );
+
+    const accentMaterial = useMemo(
+      () =>
+        new MeshStandardMaterial({
+          color: '#111116',
+          metalness: 0.75,
+          roughness: 0.22,
+        }),
+      []
+    );
+
+    const decalMaterial = useMemo(
+      () =>
+        new MeshBasicMaterial({
+          color: '#2be4ff',
+          transparent: true,
+          opacity: 0.8,
+        }),
+      []
+    );
+
+    const eyeMaterial = useMemo(
+      () =>
+        new MeshStandardMaterial({
+          color: '#0a0a0a',
+          metalness: 0.15,
+          roughness: 0.4,
+        }),
+      []
+    );
+
+    const bodyGeometry = useMemo(() => new SphereGeometry(7, 42, 42), []);
+    const tailGeometry = useMemo(() => new ConeGeometry(2.6, 6.8, 24), []);
+    const dorsalFinGeometry = useMemo(() => new ConeGeometry(2.2, 5.8, 18), []);
+    const ventralFinGeometry = useMemo(() => new ConeGeometry(1.6, 4.4, 18), []);
+    const eyeGeometry = useMemo(() => new SphereGeometry(0.8, 16, 16), []);
+    const decalGeometry = useMemo(() => new CircleGeometry(2.2, 32), []);
+    const deviceBodyGeometry = useMemo(() => new BoxGeometry(1.9, 0.9, 2.2), []);
+    const deviceWingGeometry = useMemo(() => new BoxGeometry(1.2, 0.6, 2.8), []);
+
+    useEffect(
+      () => () => {
+        bodyMaterial.dispose();
+        finMaterial.dispose();
+        accentMaterial.dispose();
+        decalMaterial.dispose();
+        eyeMaterial.dispose();
+        bodyGeometry.dispose();
+        tailGeometry.dispose();
+        dorsalFinGeometry.dispose();
+        ventralFinGeometry.dispose();
+        eyeGeometry.dispose();
+        decalGeometry.dispose();
+        deviceBodyGeometry.dispose();
+        deviceWingGeometry.dispose();
+      },
+      [
+        accentMaterial,
+        bodyGeometry,
+        bodyMaterial,
+        decalGeometry,
+        decalMaterial,
+        deviceBodyGeometry,
+        deviceWingGeometry,
+        dorsalFinGeometry,
+        eyeGeometry,
+        eyeMaterial,
+        finMaterial,
+        tailGeometry,
+        ventralFinGeometry,
+      ]
+    );
+
     useFrame((_, delta) => {
       const group = groupRef.current;
       if (!group) return;
@@ -100,8 +207,40 @@ const OceanScene: FC<{ data: NanoFishData }> = ({ data }) => {
     });
 
     return (
-      <group ref={groupRef} dispose={null} scale={0.3} position={[0, 0, 0]}>
-        <primitive object={gltf.scene} />
+      <group ref={groupRef} dispose={null} scale={0.22} position={[0, 0, 0]}>
+        <mesh geometry={bodyGeometry} material={bodyMaterial} scale={[1.35, 0.96, 0.62]} />
+        <mesh
+          geometry={tailGeometry}
+          material={finMaterial}
+          position={[-8.4, 0.5, 0]}
+          rotation={[0, 0, MathUtils.degToRad(14)]}
+          scale={[1.05, 1.25, 1]}
+        />
+        <mesh
+          geometry={dorsalFinGeometry}
+          material={finMaterial}
+          position={[0.4, 2.1, -0.2]}
+          rotation={[MathUtils.degToRad(80), 0, 0]}
+          scale={[0.85, 0.9, 0.9]}
+        />
+        <mesh
+          geometry={ventralFinGeometry}
+          material={finMaterial}
+          position={[1.2, -2.1, 0]}
+          rotation={[MathUtils.degToRad(-78), 0, 0]}
+          scale={[0.95, 0.95, 0.95]}
+        />
+        <mesh geometry={eyeGeometry} material={eyeMaterial} position={[5.6, 1, 1.2]} />
+        <mesh geometry={eyeGeometry} material={eyeMaterial} position={[5.6, 1, -1.2]} />
+        <mesh
+          geometry={decalGeometry}
+          material={decalMaterial}
+          position={[2.4, 0.4, 1.8]}
+          rotation={[0, 0, MathUtils.degToRad(8)]}
+          scale={[1.15, 1.15, 1]}
+        />
+        <mesh geometry={deviceBodyGeometry} material={accentMaterial} position={[-3.6, -0.6, -0.7]} />
+        <mesh geometry={deviceWingGeometry} material={accentMaterial} position={[-4.7, -0.5, 0.9]} />
       </group>
     );
   };

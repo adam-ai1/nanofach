@@ -23,12 +23,8 @@ export interface NanoFishData {
   compass: number;
   connection: number;
   leakDetected: boolean;
- codex/add-movement-callbacks-in-page.tsx
   fishPosition: { x: number; y: number; z: number; orientation: number };
-
-  fishPosition: { x: number; y: number; z: number };
   fishOrientation: { yaw: number; pitch: number; roll: number };
- main
 }
 
 export type SensorStatus = {
@@ -47,6 +43,20 @@ const DEFAULT_BACKGROUND_VIDEO_URL =
   process.env.NEXT_PUBLIC_BACKGROUND_VIDEO_URL ??
   'https://firebasestorage.googleapis.com/v0/b/firebase-studio-demo-project.appspot.com/o/defaults%2Fwater_in_fishtank.mp4?alt=media&token=8fa6c52a-6058-45e0-b635-b82531649642';
 const LOCAL_BACKGROUND_VIDEO_KEY = 'backgroundVideoUrl';
+const MAX_PERSISTABLE_VIDEO_BYTES = 4.5 * 1024 * 1024;
+const fileToDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Unsupported file result.'));
+      }
+    };
+    reader.onerror = () => reject(reader.error ?? new Error('Failed to read file.'));
+    reader.readAsDataURL(file);
+  });
 
 export default function DashboardPage() {
   const { toast } = useToast();
@@ -61,17 +71,14 @@ export default function DashboardPage() {
     compass: 45,
     connection: 4,
     leakDetected: false,
- codex/add-movement-callbacks-in-page.tsx
     fishPosition: { x: 0, y: 0, z: 0, orientation: 0 },
-
-    fishPosition: { x: 0, y: 0, z: 0 },
     fishOrientation: { yaw: 0, pitch: 0, roll: 0 },
- main
   });
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const [sensorStatus, setSensorStatus] = useState<SensorStatus>({
     camera: true,
     sonar: true,
@@ -124,6 +131,7 @@ export default function DashboardPage() {
           x: Math.max(-60, Math.min(60, prev.fishPosition.x + (Math.random() - 0.5) * 4)),
           y: Math.max(-40, Math.min(40, prev.fishPosition.y + (Math.random() - 0.5) * 3)),
           z: Math.max(-30, Math.min(30, prev.fishPosition.z + (Math.random() - 0.5) * 3)),
+          orientation: prev.fishPosition.orientation,
         },
         fishOrientation: {
           yaw: (prev.fishOrientation.yaw + (Math.random() - 0.5) * 8 + 360) % 360,
@@ -233,7 +241,6 @@ export default function DashboardPage() {
     });
   };
 
- codex/add-movement-callbacks-in-page.tsx
   const handleAscend = () => {
     setData((prev) => {
       const newZ = Math.min(50, prev.fishPosition.z + 5);
@@ -271,7 +278,64 @@ export default function DashboardPage() {
       setBackgroundVideoUrl(storedVideoUrl);
     }
   }, []);
- main
+
+  useEffect(
+    () => () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+    },
+    []
+  );
+
+  const persistBackgroundVideo = (value: string | null) => {
+    if (value) {
+      localStorage.setItem(LOCAL_BACKGROUND_VIDEO_KEY, value);
+    } else {
+      localStorage.removeItem(LOCAL_BACKGROUND_VIDEO_KEY);
+    }
+  };
+
+  const handleBackgroundVideoUrlChange = (url: string) => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+    setBackgroundVideoUrl(url);
+    persistBackgroundVideo(url);
+  };
+
+  const handleBackgroundVideoFileChange = async (file: File) => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+    }
+    const objectUrl = URL.createObjectURL(file);
+    objectUrlRef.current = objectUrl;
+    setBackgroundVideoUrl(objectUrl);
+
+    if (file.size <= MAX_PERSISTABLE_VIDEO_BYTES) {
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        persistBackgroundVideo(dataUrl);
+        return true;
+      } catch (error) {
+        persistBackgroundVideo(null);
+        return false;
+      }
+    }
+
+    persistBackgroundVideo(null);
+    return false;
+  };
+
+  const handleResetBackgroundVideo = () => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+    setBackgroundVideoUrl(DEFAULT_BACKGROUND_VIDEO_URL);
+    persistBackgroundVideo(DEFAULT_BACKGROUND_VIDEO_URL);
+  };
 
   return (
     <main className="flex flex-col h-[100dvh] w-screen overflow-hidden bg-background">
@@ -284,6 +348,11 @@ export default function DashboardPage() {
           data={data}
           sensorStatus={sensorStatus}
           onSensorToggle={handleSensorToggle}
+          backgroundVideoUrl={backgroundVideoUrl}
+          defaultBackgroundVideoUrl={DEFAULT_BACKGROUND_VIDEO_URL}
+          onBackgroundVideoUrlChange={handleBackgroundVideoUrlChange}
+          onBackgroundVideoFileChange={handleBackgroundVideoFileChange}
+          onResetBackgroundVideo={handleResetBackgroundVideo}
         />
       </div>
       <ControlPanel
