@@ -3,7 +3,7 @@
 import type { FC } from 'react';
 import type { NanoFishData } from '@/app/page';
 import Compass from '@/components/dashboard/compass';
-import { Battery, Waves, Fish } from 'lucide-react';
+import { Battery, Waves, Fish, RotateCw, MoveVertical } from 'lucide-react';
 import { useContext } from 'react';
 import { LanguageContext } from '@/context/language-context';
 
@@ -11,19 +11,20 @@ interface MainViewportProps {
   data: NanoFishData;
 }
 
-const FishModel: FC<{ position: { x: number; y: number; z: number } }> = ({
-  position,
-}) => {
-  const { x } = position;
+const FishModel: FC<{
+  position: { x: number; y: number; z: number; orientation: number };
+}> = ({ position }) => {
+  const { x, z, orientation } = position;
   // Make the fish flip horizontally based on direction
   const scaleX = x >= 0 ? 1 : -1;
   const translateX = `calc(-50% + ${x}px)`;
+  const translateY = `calc(-50% - ${z}px)`;
 
   return (
     <div
       className="absolute top-1/2 left-1/2 transition-transform duration-500"
       style={{
-        transform: `translate(${translateX}, -50%) scaleX(${scaleX})`,
+        transform: `translate(${translateX}, ${translateY}) rotate(${orientation}deg) scaleX(${scaleX})`,
       }}
     >
       <Fish
@@ -105,6 +106,21 @@ const MainViewport: FC<MainViewportProps> = ({ data }) => {
 
       <div
         dir={direction}
+        className={`absolute top-28 text-white p-2 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${compassPositionClasses}`}
+      >
+        <div className="flex items-center gap-2">
+          <RotateCw className="h-5 w-5 text-primary" />
+          <div>
+            <span className="text-xs text-primary/80">{t.main.orientation}</span>
+            <p className="font-mono text-xl font-bold">
+              {data.fishPosition.orientation.toFixed(0)}°
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        dir={direction}
         className={`absolute bottom-4 text-white p-3 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${depthPositionClasses}`}
       >
         <div className="flex items-end gap-2">
@@ -114,6 +130,24 @@ const MainViewport: FC<MainViewportProps> = ({ data }) => {
             <p className="font-mono text-3xl font-bold">
               {data.depth.toFixed(1)}
               <span className={`text-xl ${language === 'ar' ? 'mr-1' : 'ml-1'}`}>
+                m
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        dir={direction}
+        className={`absolute bottom-28 text-white p-3 rounded-lg bg-black/20 backdrop-blur-sm border border-primary/20 ${depthPositionClasses}`}
+      >
+        <div className="flex items-end gap-2">
+          <MoveVertical className="h-6 w-6 text-primary" />
+          <div>
+            <span className="text-xs text-primary/80">{t.main.altitude}</span>
+            <p className="font-mono text-2xl font-bold">
+              {data.fishPosition.z.toFixed(1)}
+              <span className={`text-sm ${language === 'ar' ? 'mr-1' : 'ml-1'}`}>
                 m
               </span>
             </p>
