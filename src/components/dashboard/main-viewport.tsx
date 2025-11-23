@@ -4,11 +4,12 @@ import type { FC } from 'react';
 import type { NanoFishData } from '@/app/page';
 import Compass from '@/components/dashboard/compass';
 import { Battery, Waves, Fish } from 'lucide-react';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { LanguageContext } from '@/context/language-context';
 
 interface MainViewportProps {
   data: NanoFishData;
+  backgroundVideoUrl?: string;
 }
 
 const FishModel: FC<{ position: { x: number; y: number; z: number } }> = ({
@@ -35,9 +36,19 @@ const FishModel: FC<{ position: { x: number; y: number; z: number } }> = ({
 };
 
 
-const MainViewport: FC<MainViewportProps> = ({ data }) => {
+const defaultPoster =
+  'https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmaXNoJTIwdGFua3xlbnwwfHx8fDE3MTc4NTMwNTl8MA&ixlib=rb-4.0.3&q=80&w=1080';
+const defaultVideo =
+  'https://firebasestorage.googleapis.com/v0/b/firebase-studio-demo-project.appspot.com/o/defaults%2Fwater_in_fishtank.mp4?alt=media&token=8fa6c52a-6058-45e0-b635-b82531649642';
+
+const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
   const { t, language } = useContext(LanguageContext);
+  const [useFallbackVideo, setUseFallbackVideo] = useState(false);
   const direction = language === 'ar' ? 'rtl' : 'ltr';
+
+  const resolvedVideoUrl = !useFallbackVideo && backgroundVideoUrl
+    ? backgroundVideoUrl
+    : defaultVideo;
 
   const getBatteryColor = (level: number) => {
     if (level < 20) return 'text-destructive';
@@ -66,13 +77,12 @@ const MainViewport: FC<MainViewportProps> = ({ data }) => {
         autoPlay
         loop
         muted
+        key={resolvedVideoUrl}
         className="absolute inset-0 w-full h-full object-cover"
-        poster="https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmaXNoJTIwdGFua3xlbnwwfHx8fDE3MTc4NTMwNTl8MA&ixlib=rb-4.0.3&q=80&w=1080"
+        poster={defaultPoster}
+        onError={() => setUseFallbackVideo(true)}
       >
-        <source
-          src="https://firebasestorage.googleapis.com/v0/b/firebase-studio-demo-project.appspot.com/o/defaults%2Fwater_in_fishtank.mp4?alt=media&token=8fa6c52a-6058-45e0-b635-b82531649642"
-          type="video/mp4"
-        />
+        <source src={resolvedVideoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       <div className="absolute inset-0 bg-black/40" />
