@@ -1,7 +1,6 @@
 'use client';
 
 import type { FC } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
