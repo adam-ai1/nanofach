@@ -1,20 +1,11 @@
 'use client';
 
 import type { FC } from 'react';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { NanoFishData } from '@/app/page';
 import Compass from '@/components/dashboard/compass';
- codex/add-movement-callbacks-in-page.tsx
 import { Battery, Waves, Fish, RotateCw, MoveVertical } from 'lucide-react';
-import { useContext } from 'react';
-
- codex/add-3d-scene-integration-in-mainviewport
-import { Battery, Waves } from 'lucide-react';
-
-import { Battery, Waves, Fish } from 'lucide-react';
-import { useContext, useState } from 'react';
- main
 import { LanguageContext } from '@/context/language-context';
 
 interface MainViewportProps {
@@ -22,7 +13,6 @@ interface MainViewportProps {
   backgroundVideoUrl?: string;
 }
 
- codex/add-movement-callbacks-in-page.tsx
 const FishModel: FC<{
   position: { x: number; y: number; z: number; orientation: number };
 }> = ({ position }) => {
@@ -51,7 +41,6 @@ const OceanScene = dynamic(() => import('./ocean-scene'), {
   ssr: false,
   loading: () => <div className="absolute inset-0" aria-hidden />,
 });
- main
 
 const defaultPoster =
   'https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmaXNoJTIwdGFua3xlbnwwfHx8fDE3MTc4NTMwNTl8MA&ixlib=rb-4.0.3&q=80&w=1080';
@@ -63,9 +52,8 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
   const [useFallbackVideo, setUseFallbackVideo] = useState(false);
   const direction = language === 'ar' ? 'rtl' : 'ltr';
 
-  const resolvedVideoUrl = !useFallbackVideo && backgroundVideoUrl
-    ? backgroundVideoUrl
-    : defaultVideo;
+  const resolvedVideoUrl =
+    !useFallbackVideo && backgroundVideoUrl ? backgroundVideoUrl : defaultVideo;
 
   const getBatteryColor = (level: number) => {
     if (level < 20) return 'text-destructive';
@@ -90,7 +78,6 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
 
   return (
     <div className="absolute inset-0 z-0">
- codex/add-3d-scene-integration-in-mainviewport
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-sky-950/40 to-slate-950" />
       <OceanScene data={data} />
 
@@ -109,7 +96,6 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
       <div className="absolute inset-0 bg-black/40" />
 
       <FishModel position={data.fishPosition} />
- main
 
       {/* Overlays */}
       <div

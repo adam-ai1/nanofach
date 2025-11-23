@@ -4,7 +4,7 @@ import type { FC } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { NanoFishData } from '@/app/page';
 import { Color, Euler, Group, MathUtils, Quaternion, Vector3 } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 type FiberExports = typeof import('@react-three/fiber');
 type DreiExports = typeof import('@react-three/drei');
