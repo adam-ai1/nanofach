@@ -278,6 +278,7 @@ export default function DashboardPage() {
       setBackgroundVideoUrl(storedVideoUrl);
     }
   }, []);
+ codex/check-for-errors-in-project-ivrcrk
 
   useEffect(
     () => () => {
@@ -336,6 +337,7 @@ export default function DashboardPage() {
     setBackgroundVideoUrl(DEFAULT_BACKGROUND_VIDEO_URL);
     persistBackgroundVideo(DEFAULT_BACKGROUND_VIDEO_URL);
   };
+ main
 
   return (
     <main className="flex flex-col h-[100dvh] w-screen overflow-hidden bg-background">

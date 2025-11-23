@@ -78,6 +78,12 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
 
   return (
     <div className="absolute inset-0 z-0">
+ codex/check-for-errors-in-project-ivrcrk
+
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-sky-950/40 to-slate-950" />
+      <OceanScene data={data} />
+
+ main
       <video
         autoPlay
         loop
@@ -96,9 +102,13 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
       </div>
       <div className="absolute inset-0 bg-black/40 z-30" />
 
+ codex/check-for-errors-in-project-ivrcrk
       <div className="absolute inset-0 z-40 pointer-events-none">
         <FishModel position={data.fishPosition} />
       </div>
+
+      <FishModel position={data.fishPosition} />
+main
 
       {/* Overlays */}
       <div
