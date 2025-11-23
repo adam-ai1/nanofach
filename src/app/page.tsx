@@ -24,6 +24,7 @@ export interface NanoFishData {
   connection: number;
   leakDetected: boolean;
   fishPosition: { x: number; y: number; z: number };
+  fishOrientation: { yaw: number; pitch: number; roll: number };
 }
 
 export type SensorStatus = {
@@ -57,6 +58,7 @@ export default function DashboardPage() {
     connection: 4,
     leakDetected: false,
     fishPosition: { x: 0, y: 0, z: 0 },
+    fishOrientation: { yaw: 0, pitch: 0, roll: 0 },
   });
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isRecording, setIsRecording] = useState(false);
@@ -110,6 +112,16 @@ export default function DashboardPage() {
         compass: (prev.compass + (Math.random() - 0.4) * 10 + 360) % 360,
         connection: Math.floor(Math.random() * 2) + 3,
         leakDetected: sensorStatus.leak ? Math.random() < 0.01 : false,
+        fishPosition: {
+          x: Math.max(-60, Math.min(60, prev.fishPosition.x + (Math.random() - 0.5) * 4)),
+          y: Math.max(-40, Math.min(40, prev.fishPosition.y + (Math.random() - 0.5) * 3)),
+          z: Math.max(-30, Math.min(30, prev.fishPosition.z + (Math.random() - 0.5) * 3)),
+        },
+        fishOrientation: {
+          yaw: (prev.fishOrientation.yaw + (Math.random() - 0.5) * 8 + 360) % 360,
+          pitch: Math.max(-25, Math.min(25, prev.fishOrientation.pitch + (Math.random() - 0.5) * 4)),
+          roll: Math.max(-20, Math.min(20, prev.fishOrientation.roll + (Math.random() - 0.5) * 3)),
+        },
       }));
     }, 2000);
 
@@ -204,6 +216,11 @@ export default function DashboardPage() {
       return {
         ...prev,
         fishPosition: { ...prev.fishPosition, x: newX },
+        fishOrientation: {
+          ...prev.fishOrientation,
+          yaw: direction === 'forward' ? 0 : 180,
+          roll: Math.max(-15, Math.min(15, prev.fishOrientation.roll + (direction === 'forward' ? 3 : -3))),
+        },
       };
     });
   };

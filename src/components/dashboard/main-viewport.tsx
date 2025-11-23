@@ -1,10 +1,16 @@
 'use client';
 
 import type { FC } from 'react';
+import { useContext } from 'react';
+import dynamic from 'next/dynamic';
 import type { NanoFishData } from '@/app/page';
 import Compass from '@/components/dashboard/compass';
+ codex/add-3d-scene-integration-in-mainviewport
+import { Battery, Waves } from 'lucide-react';
+
 import { Battery, Waves, Fish } from 'lucide-react';
 import { useContext, useState } from 'react';
+ main
 import { LanguageContext } from '@/context/language-context';
 
 interface MainViewportProps {
@@ -12,29 +18,10 @@ interface MainViewportProps {
   backgroundVideoUrl?: string;
 }
 
-const FishModel: FC<{ position: { x: number; y: number; z: number } }> = ({
-  position,
-}) => {
-  const { x } = position;
-  // Make the fish flip horizontally based on direction
-  const scaleX = x >= 0 ? 1 : -1;
-  const translateX = `calc(-50% + ${x}px)`;
-
-  return (
-    <div
-      className="absolute top-1/2 left-1/2 transition-transform duration-500"
-      style={{
-        transform: `translate(${translateX}, -50%) scaleX(${scaleX})`,
-      }}
-    >
-      <Fish
-        className="w-48 h-48 text-primary/70 drop-shadow-[0_0_15px_hsl(var(--primary)_/_0.5)]"
-        strokeWidth={1}
-      />
-    </div>
-  );
-};
-
+const OceanScene = dynamic(() => import('./ocean-scene'), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0" aria-hidden />,
+});
 
 const defaultPoster =
   'https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmaXNoJTIwdGFua3xlbnwwfHx8fDE3MTc4NTMwNTl8MA&ixlib=rb-4.0.3&q=80&w=1080';
@@ -73,6 +60,10 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
 
   return (
     <div className="absolute inset-0 z-0">
+ codex/add-3d-scene-integration-in-mainviewport
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-sky-950/40 to-slate-950" />
+      <OceanScene data={data} />
+
       <video
         autoPlay
         loop
@@ -88,6 +79,7 @@ const MainViewport: FC<MainViewportProps> = ({ data, backgroundVideoUrl }) => {
       <div className="absolute inset-0 bg-black/40" />
 
       <FishModel position={data.fishPosition} />
+ main
 
       {/* Overlays */}
       <div
